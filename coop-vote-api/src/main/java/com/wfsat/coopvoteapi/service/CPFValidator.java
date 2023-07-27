@@ -2,7 +2,7 @@ package com.wfsat.coopvoteapi.service;
 
 public class CPFValidator {
 
-    public static boolean isValidCPF(String strCpf) {
+    public boolean isValidCPF(String strCpf) {
     		try {
     			if ((strCpf == null) || (strCpf.length() != 11))
     				return false;

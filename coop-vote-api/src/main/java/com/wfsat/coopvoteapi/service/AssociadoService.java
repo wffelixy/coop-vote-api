@@ -19,7 +19,7 @@ public class AssociadoService {
         this.associadoRepository = associadoRepository;
     }
 
-    public Associado cadastrarAssociado(Associado associado) {    		
+    public Associado cadastrarAssociado(Associado associado) { 
         return associadoRepository.save(associado);
     }
 

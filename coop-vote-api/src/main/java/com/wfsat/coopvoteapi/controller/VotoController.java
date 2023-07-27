@@ -27,6 +27,9 @@ public class VotoController {
         	return ResponseEntity.notFound().build();
         }
         
+        //Oculta para o associado não ter essa informação no retorno da confirmação do seu voto.
+        voto.getPauta().setResultadoVotacao(null);
+        
         return new ResponseEntity<>(voto, HttpStatus.CREATED);
     }
 

@@ -27,6 +27,7 @@ public class Pauta {
     private Integer duracaoEmSegundos;
     
     private String resultadoVotacao;
+    
     @JsonIgnore
     private Integer tempoRestante;
     

@@ -9,12 +9,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.wfsat.coopvoteapi.exception.PautaNotFoundException;
 import com.wfsat.coopvoteapi.model.Pauta;
 import com.wfsat.coopvoteapi.model.Voto;
+import com.wfsat.coopvoteapi.repository.AssociadoRepository;
 import com.wfsat.coopvoteapi.repository.PautaRepository;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.transaction.Transactional;
 
 @Service
 @EnableScheduling
@@ -22,31 +21,22 @@ public class PautaService {
 
 	private List<Pauta> pautasEmMemoria = new ArrayList<>();
 
-	private List<Pauta> pautasEmEspera = new ArrayList<>();
-
-	private Boolean pautasEmExecucao = false;
-
 	private final PautaRepository pautaRepository;
+	
+	@Autowired
+	private  AssociadoRepository associadoRepository;
 
 	@Autowired
 	public PautaService(PautaRepository pautaRepository) {
 		this.pautaRepository = pautaRepository;
-		abrirSessaoVotacao();
 	}
 
 	public Pauta cadastrarPauta(Pauta pautaRequest) {
-		Pauta pauta = new Pauta();
-		pautaRequest.setTempoRestante(pautaRequest.getDuracaoEmSegundos());
-		pauta = pautaRepository.save(pautaRequest);
+		if (pautaRequest.getDuracaoEmSegundos() == null) {
+			pautaRequest.setDuracaoEmSegundos(60);
+		}
 
-		adicionaPautaListaEspera(pauta);
-
-		return pauta;
-	}
-
-	@PostConstruct
-	public void carregarPautasEmMemoria() {
-		pautasEmMemoria = pautaRepository.findAll();
+		return pautaRepository.save(pautaRequest);
 	}
 
 	public List<Pauta> listarPautas() {
@@ -59,15 +49,25 @@ public class PautaService {
 	}
 
 	// Método para abrir sessão de votação por um tempo determinado (em segundos)
-	public void abrirSessaoVotacao() {
-		List<Pauta> pautas = pautaRepository.findAll();
+	public void abrirSessaoVotacao(Long pautaId, Integer duracaoSessao, Long AssociadoId) throws Exception {
+		Optional<Pauta> pauta = pautaRepository.findById(pautaId);
 
-		for (Pauta pauta : pautas) {
-			if (pauta.getDuracaoEmSegundos() > 0) {
-				pauta.setSessaoAberta(true);
-				pauta.setTempoRestante(pauta.getDuracaoEmSegundos());
-				pautaRepository.save(pauta);
-			}
+		if (!pauta.isPresent()) {
+			throw new Exception("Pauta não encontrada!");
+		}
+		
+		// Verificar se o associado está cadastrado
+	    if (!associadoRepository.existsById(AssociadoId)) {
+	        throw new Exception("Associado não cadastrado!");
+	    }
+
+		if (pauta.get().getDuracaoEmSegundos() > 0) {
+			pauta.get().setDuracaoEmSegundos(duracaoSessao);
+			pauta.get().setSessaoAberta(true);
+			pauta.get().setTempoRestante(pauta.get().getDuracaoEmSegundos());
+			pautaRepository.save(pauta.get());
+
+			pautasEmMemoria.add(pauta.get());
 		}
 	}
 
@@ -76,10 +76,6 @@ public class PautaService {
 	@Scheduled(fixedRate = 1000) // Executa a cada segundo
 	public void fecharSessoesVotacao() {
 
-		if (pautasEmMemoria == null || pautasEmMemoria.isEmpty()) {
-			pautasEmMemoria = pautaRepository.findAll();
-		}
-		pautasEmExecucao = true;
 		for (Pauta pauta : pautasEmMemoria) {
 			if (pauta.isSessaoAberta()) {
 				int duracaoEmSegundos = pauta.getTempoRestante();
@@ -98,32 +94,16 @@ public class PautaService {
 				}
 			}
 
-			pautasEmExecucao = false;
-
 		}
 	}
 
-	public void adicionaPautaListaEspera(Pauta pauta) {
-		pautasEmEspera.add(pauta);
+	// Contabiliza os votos de uma Pauta
+	public void contabilizarVotos(Pauta pauta) throws Exception {
 
-		for (Pauta pautaAux : pautasEmEspera) {
-			System.out.println("novas pautas em espera: " + " = " + pautaAux.getTitulo());
+		if (pauta.isSessaoAberta()) {
+			throw new PautaNotFoundException(
+					"Não foi possível contabilizar, pois a sessão para votaão ainda está aberta!");
 		}
-	}
-
-	@Scheduled(fixedRate = 1000)
-	public void abrirSessaoVotacaoNovaPauta() {
-		if (!pautasEmExecucao) {
-			for (Pauta pauta : pautasEmEspera) {
-				pautasEmMemoria.add(pauta);
-			}
-			pautasEmEspera.clear();
-
-		}
-	}
-
-	@Transactional
-	public void contabilizarVotos(Pauta pauta) {
 
 		if (pauta != null) {
 			int votosSim = 0;
@@ -138,8 +118,9 @@ public class PautaService {
 				}
 			}
 			int totalVotos = votosSim + votosNao;
-			String resultadoVotacao = "Votos [SIM] = " + votosSim + " - Votos [NÃO] = " + votosNao
-					+ " --- Total de voto = " + totalVotos + ". Resultado: ";
+			String resultadoVotacao = "[" + votosSim + "]" + "votos = [SIM]. " 
+                    +"[" + votosNao + "]" + "votos = [Não]. "
+                    +"[" + totalVotos + "]" + "totais. " + "  Resultado: ";
 			if (votosSim > votosNao) {
 				resultadoVotacao += "Aprovado";
 			} else if (votosSim < votosNao) {

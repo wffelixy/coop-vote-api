@@ -1,9 +1,11 @@
 package com.wfsat.coopvoteapi.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.wfsat.coopvoteapi.exception.SessaoVotacaoException;
 import com.wfsat.coopvoteapi.model.Associado;
 import com.wfsat.coopvoteapi.model.Pauta;
 import com.wfsat.coopvoteapi.model.Voto;
@@ -25,14 +27,23 @@ public class VotoService {
         this.votoRepository = votoRepository;
     }
 
+    //Método que registra o voto
     public Voto registrarVoto(String voto, Long pautaId, String cpf) {
     	Pauta pauta = servicePautaRepository.obterPautaPorId(pautaId);
     	
     	if(!pauta.isSessaoAberta()) {
-    		return null;
+    		throw new SessaoVotacaoException("Sessão encerrada!");
     	}
     	
     	Associado associado = serviceAssociadoRepository.obterAssociadoPorCpf(cpf);
+    	
+    	if(associado == null) {
+    		throw new SessaoVotacaoException("Associado não cadastrador!");
+    	}
+    	
+    	if (associadoJaVotouNaPauta(associado, pauta)) {
+            throw new SessaoVotacaoException("Associado já votou nesta pauta!");
+        }
     	
         Voto novoVoto = new Voto();
         novoVoto.setVoto(voto);
@@ -40,6 +51,12 @@ public class VotoService {
         novoVoto.setAssociado(associado);
         
         return votoRepository.save(novoVoto);
+    }
+    
+    //Método paar verificar se o associado já votou na pauta.
+    private boolean associadoJaVotouNaPauta(Associado associado, Pauta pauta) {
+        List<Voto> votosDoAssociado = votoRepository.findByAssociadoAndPauta(associado, pauta);
+        return !votosDoAssociado.isEmpty();
     }
     
 }

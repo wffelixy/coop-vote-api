@@ -15,9 +15,12 @@ public class Associado {
     private Long id;
 
     private String nome;
+   
     private String cpf;
+   
     private String email;
-	public Long getId() {
+	
+    public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
