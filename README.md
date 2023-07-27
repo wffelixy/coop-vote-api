@@ -1,5 +1,42 @@
 # coop-vote-api
 
+# Projeto Java para Gerenciamento de Sessões de Votação Cooperativa
+
+# Nome do Projeto: "CoopVoteAPI"
+
+# Descrição do Projeto:
+O "CoopVoteAPI" é um projeto de solução back-end que permite o gerenciamento de sessões de votação cooperativa. Ele oferece uma API para que os associados possam participar de assembleias e tomar decisões através de votações.
+
+# Funcionalidades da API:
+
+# Criar uma nova sessão de votação:
+Um associado com autorização poderá criar uma nova sessão de votação, definindo a pauta e o período de duração da votação.
+
+# Iniciar uma sessão de votação:
+O responsável poderá iniciar a votação para uma pauta específica, permitindo que os associados participem.
+
+# Votar em uma sessão de votação:
+
+Os associados poderão votar em uma sessão de votação em andamento. Cada associado possui um único voto.
+# Encerrar uma sessão de votação:
+
+Ao término do período de votação, o responsável encerra a sessão de votação e computa os resultados.
+
+# Verificar resultado da votação:
+Após o encerramento, os associados poderão consultar o resultado da votação.
+
+# Gerenciar associados:
+Possibilidade de cadastrar novos associados e atribuir autorização para criar sessões de votação.
+
+# Autenticação e autorização:
+A API deve ter um sistema de autenticação seguro para garantir que apenas associados autorizados possam criar sessões de votação.
+
+# Tecnologias Utilizadas:
+Linguagem: Java
+Framework Web: Spring Boot
+Banco de Dados: MySQL ou outro banco de dados relacional
+Autenticação: JSON Web Tokens (JWT) para autenticação e autorização.
+
 # CoopVoteAPI
 
 A CoopVoteAPI é uma API REST desenvolvida em Java com Spring Boot para gerenciar sessões de votação em pautas de uma cooperativa. Cada associado pode votar em uma pauta e as decisões são tomadas por votação em assembleias.
