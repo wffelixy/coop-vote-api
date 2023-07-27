@@ -120,8 +120,8 @@ Exemplo - localhost:8080/api/pautas/23
     "resultadoVotacao": "[0]votos = [SIM]. [0]votos = [Não]. [0]totais.   Resultado: Empate"
 }
 
-# POST /api/pautas/{id}/sessao: Abre uma sessão de votação em uma pauta
-Exemplo - localhost:8080/api/pautas/23/abrir-sessao
+# POST /api/pautas/{id}/abrir-sessao?associadoId={id}: Abre uma sessão de votação em uma pauta
+Exemplo - localhost:8080/api/pautas/1/abrir-sessao?associadoId=1
 
 # JSON de saída:
 {
