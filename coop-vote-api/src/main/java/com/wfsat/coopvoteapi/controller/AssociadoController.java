@@ -55,8 +55,8 @@ public class AssociadoController {
 
         // Verifica se o CPF é válido
         if (votoElegivel != null && "ABLE_TO_VOTE".equals(votoElegivel.getVotoStatus())) {
-            // CPF é válido, cadastra o associado
-        	
+           
+        	// CPF é válido, cadastra o associado        	
         	associado.setElegivel(votoElegivel.getVotoStatus());
             Associado novoAssociado = associadoService.cadastrarAssociado(associado);
             return new ResponseEntity<>(novoAssociado, HttpStatus.CREATED);

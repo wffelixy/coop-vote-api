@@ -282,8 +282,17 @@ CREATE TABLE voto (
     CONSTRAINT fk_voto_associado FOREIGN KEY (associado_id) REFERENCES associado (id)
 );
 
-No arquivo application.properties conte a estrutura para conectar ao banco
+No arquivo application.properties contém a estrutura para conectar ao banco
 
 spring.datasource.username=root
 spring.datasource.password=root
+
+
+Executar o projetos microserviço coop-vote-api e o valida-cpf
+
+coop-vote-api esta na porta padrão 8080 
+valida-cpf esta na porta 8081 conforme arquivo de configuração application.proprierties
+
+
+Após cadastrar Associado, Pauta é possível iniciar a sessão e fazer a votação.
 

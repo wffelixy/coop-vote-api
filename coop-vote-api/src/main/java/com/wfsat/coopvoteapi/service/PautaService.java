@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,6 +20,8 @@ import com.wfsat.coopvoteapi.repository.PautaRepository;
 @Service
 @EnableScheduling
 public class PautaService {
+	
+	private static final Logger log = LoggerFactory.getLogger(PautaService.class);
 
 	private List<Pauta> pautasEmMemoria = new ArrayList<>();
 
@@ -90,7 +94,7 @@ public class PautaService {
 					}
 
 					pauta.setTempoRestante(duracaoEmSegundos);
-					System.out.println("Tempo restante da" + pauta.getTitulo() + " = " + pauta.getTempoRestante());
+					log.info("Tempo restante da sessão [" + pauta.getTitulo() + "] = " + pauta.getTempoRestante());
 				}
 			}
 
@@ -99,10 +103,11 @@ public class PautaService {
 
 	// Contabiliza os votos de uma Pauta
 	public void contabilizarVotos(Pauta pauta) throws Exception {
-
+		
+		log.info("Contabilizando votos [" + pauta.getTitulo()+"].");
 		if (pauta.isSessaoAberta()) {
 			throw new PautaNotFoundException(
-					"Não foi possível contabilizar, pois a sessão para votaão ainda está aberta!");
+					"Não foi possível contabilizar, pois a sessão para votação ainda está aberta!");
 		}
 
 		if (pauta != null) {
@@ -130,6 +135,8 @@ public class PautaService {
 			}
 
 			pauta.setResultadoVotacao(resultadoVotacao);
+			
+			log.info("Gravando resultado...");
 			pautaRepository.save(pauta);
 		}
 
