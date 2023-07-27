@@ -45,6 +45,10 @@ public class VotoService {
             throw new SessaoVotacaoException("Associado já votou nesta pauta!");
         }
     	
+    	if(associado.getElegivel() == null || !associado.getElegivel().equals("ABLE_TO_VOTE")) {
+    		 throw new SessaoVotacaoException("Associado não elegível para votação!");
+    	}
+    	
         Voto novoVoto = new Voto();
         novoVoto.setVoto(voto);
         novoVoto.setPauta(pauta);

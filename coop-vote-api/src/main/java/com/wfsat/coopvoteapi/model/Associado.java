@@ -19,6 +19,8 @@ public class Associado {
     private String cpf;
    
     private String email;
+    
+    private String elegivel;
 	
     public Long getId() {
 		return id;
@@ -43,6 +45,13 @@ public class Associado {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+			
+	public String getElegivel() {
+		return elegivel;
+	}
+	public void setElegivel(String elegivel) {
+		this.elegivel = elegivel;
 	}
 	@Override
 	public int hashCode() {
