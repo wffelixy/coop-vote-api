@@ -246,3 +246,44 @@ Exemplo - localhost:8080/api/associados/email/marisa.l@example.com
     "cpf": "05883022014",
     "email": "marisa.l@example.com"
 }
+
+
+# OBS: 
+
+# Criar o banco de dados "cooperapi" com a seguinte estrutura: 
+
+
+CREATE TABLE pauta (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    titulo VARCHAR(255) NOT NULL,
+    sessao_aberta TINYINT(1) DEFAULT 0,
+    duracao_em_segundos INT DEFAULT 60,
+    resultado_votacao VARCHAR(10),
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE associado (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(255) NOT NULL,
+    cpf VARCHAR(11) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE (cpf),
+    UNIQUE (email)
+);
+
+CREATE TABLE voto (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    pauta_id BIGINT NOT NULL,
+    associado_id BIGINT NOT NULL,
+    voto VARCHAR(5) NOT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_voto_pauta FOREIGN KEY (pauta_id) REFERENCES pauta (id),
+    CONSTRAINT fk_voto_associado FOREIGN KEY (associado_id) REFERENCES associado (id)
+);
+
+No arquivo application.properties conte a estrutura para conectar ao banco
+
+spring.datasource.username=root
+spring.datasource.password=root
+
